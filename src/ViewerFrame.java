@@ -78,15 +78,15 @@ public class ViewerFrame extends JFrame {
         });
 
         yawSlider.addChangeListener(listener -> {
-            //System.out.println("yaw: " + yawSlider.getValue());
+            System.out.println("Oy: " + yawSlider.getValue());
             renderPanel.repaint();
         });
         pitchSlider.addChangeListener(listener -> {
-            //System.out.println("pitch: " + pitchSlider.getValue());
+            System.out.println("Ox: " + pitchSlider.getValue());
             renderPanel.repaint();
         });
         rollSlider.addChangeListener(listener -> {
-            //System.out.println("roll: " + rollSlider.getValue());
+            System.out.println("Oz: " + rollSlider.getValue());
             renderPanel.repaint();
         });
 

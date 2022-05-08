@@ -20,8 +20,7 @@ public class OBJParser {
             for (String line : lines) {
                 if (line.matches("^v\\s+.*")) {
                     String[] terms = line.split("\\s+");
-                    // Todo: remove this and add zoom
-                    Vertex v = new Vertex(100 * Double.parseDouble(terms[1]), 100 * Double.parseDouble(terms[2]), 100 * Double.parseDouble(terms[3]));
+                    Vertex v = new Vertex(Double.parseDouble(terms[1]), Double.parseDouble(terms[2]), Double.parseDouble(terms[3]));
                     vertices.add(v);
                 }
 

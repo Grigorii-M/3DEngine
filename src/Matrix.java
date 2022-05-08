@@ -197,7 +197,7 @@ public class Matrix {
         return new Matrix(cofactors, rows, columns);
     }
 
-    public static Matrix getXYRotationMatrix(double degAngle) {
+    public static Matrix getXYRightHandedRotationMatrix(double degAngle) {
         double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 cos(radAngle), -sin(radAngle), 0,
@@ -206,16 +206,7 @@ public class Matrix {
         }, 3, 3);
     }
 
-    public static Matrix getYZRotationMatrix(double degAngle) {
-        double radAngle = Math.toRadians(degAngle);
-        return new Matrix(new double[] {
-                1, 0, 0,
-                0, cos(radAngle), sin(radAngle),
-                0, -sin(radAngle), cos(radAngle)
-        }, 3, 3);
-    }
-
-    public static Matrix getYZRotationMatrixAlt(double degAngle) {
+    public static Matrix getYZRightHandedRotationMatrixAlt(double degAngle) {
         double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 1, 0, 0,
@@ -224,7 +215,7 @@ public class Matrix {
         }, 3, 3);
     }
 
-    public static Matrix getXZRotationMatrix(double degAngle) {
+    public static Matrix getXZRightHandedRotationMatrix(double degAngle) {
         double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 cos(radAngle), 0, -sin(radAngle),
@@ -233,7 +224,25 @@ public class Matrix {
         }, 3, 3);
     }
 
-    public static Matrix getXZRotationMatrixAlt(double degAngle) {
+    public static Matrix getXYLeftHandedRotationMatrix(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
+        return new Matrix(new double[] {
+                cos(radAngle), sin(radAngle), 0,
+                -sin(radAngle), cos(radAngle), 0,
+                0, 0, 1
+        }, 3, 3);
+    }
+
+    public static Matrix getYZLeftHandedRotationMatrix(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
+        return new Matrix(new double[] {
+                1, 0, 0,
+                0, cos(radAngle), sin(radAngle),
+                0, -sin(radAngle), cos(radAngle)
+        }, 3, 3);
+    }
+
+    public static Matrix getXZLeftHandedRotationMatrixAlt(double degAngle) {
         double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 cos(radAngle), 0, sin(radAngle),

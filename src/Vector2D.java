@@ -1,9 +1,9 @@
-public class Vector3D {
+public class Vector2D {
     private final double[] values;
     private Double magnitude = null;
 
-    public Vector3D(double x, double y, double z) {
-        this.values = new double[] {x, y, z};
+    public Vector2D(double x, double y) {
+        this.values = new double[] {x, y};
     }
 
     public double x() {
@@ -12,20 +12,6 @@ public class Vector3D {
 
     public double y() {
         return values[1];
-    }
-
-    public double z() {
-        return values[2];
-    }
-
-    public static Vector3D crossProduct(Vector3D vector1, Vector3D vector2) {
-
-        double[] newValues = new double[vector1.values.length];
-        newValues[0] = vector1.values[1] * vector2.values[2] - vector1.values[2] * vector2.values[1];
-        newValues[1] = vector1.values[2] * vector2.values[0] - vector1.values[0] * vector2.values[2];
-        newValues[2] = vector1.values[0] * vector2.values[1] - vector1.values[1] * vector2.values[0];
-
-        return new Vector3D(newValues[0], newValues[1], newValues[2]);
     }
 
     public double getMagnitude() {
@@ -42,16 +28,16 @@ public class Vector3D {
         return magnitude;
     }
 
-    public Vector3D normalize() {
+    public Vector2D normalize() {
         double[] newValues = new double[values.length];
         for (int i = 0; i < newValues.length; i++) {
             newValues[i] = values[i] / getMagnitude();
         }
 
-        return new Vector3D(newValues[0], newValues[1], newValues[2]);
+        return new Vector2D(newValues[0], newValues[1]);
     }
 
-    public double dotProduct(Vector3D vector) {
+    public double dotProduct(Vector2D vector) {
         if (values.length != vector.values.length) {
             throw new IllegalArgumentException("Vectors are not of the same length");
         }
@@ -64,7 +50,7 @@ public class Vector3D {
         return dotProduct;
     }
 
-    public double multiply(Vector3D v) {
+    public double multiply(Vector2D v) {
         double res = 0;
         for (int i = 0; i < values.length; i++) {
             res += v.values[i] * values[i];
@@ -73,7 +59,7 @@ public class Vector3D {
         return res;
     }
 
-    public Vector3D applyTransformation(Matrix transformation) {
+    public Vector2D applyTransformation(Matrix transformation) {
         double[] newValues = new double[values.length];
         for (int i = 0; i < values.length; i++) {
             double value = 0;
@@ -83,7 +69,7 @@ public class Vector3D {
             newValues[i] = value;
         }
 
-        return new Vector3D(newValues[0], newValues[1], newValues[2]);
+        return new Vector2D(newValues[0], newValues[1]);
     }
 
     @Override

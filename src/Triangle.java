@@ -15,8 +15,8 @@ public final class Triangle {
     }
 
     public Vector3D getNormal() {
-        Vector3D vectorA = new Vector3D(v2.x() - v1.x(), v2.y() - v1.y(), v2.z() - v1.z());
-        Vector3D vectorB = new Vector3D(v3.x() - v1.x(), v3.y() - v1.y(), v3.z() - v1.z());
+        Vector3D vectorA = new Vector3D(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+        Vector3D vectorB = new Vector3D(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z);
         return Vector3D.crossProduct(vectorA, vectorB);
     }
 

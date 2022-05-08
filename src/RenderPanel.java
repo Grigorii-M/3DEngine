@@ -14,6 +14,7 @@ public class RenderPanel extends JPanel {
         this.yawSlider = yawSlider;
         this.pitchSlider = pitchSlider;
         this.rollSlider = rollSlider;
+        setPreferredSize(new Dimension(512, 512));
     }
 
 
@@ -44,9 +45,9 @@ public class RenderPanel extends JPanel {
         for (Triangle triangle : currentObject) {
             Path2D edgePath = new Path2D.Double();
             Matrix triangleMatrix = new Matrix( new double[] {
-                triangle.v1.x, triangle.v1.y, triangle.v1.z,
-                triangle.v2.x, triangle.v2.y, triangle.v2.z,
-                triangle.v3.x, triangle.v3.y, triangle.v3.z
+                triangle.v1.x(), triangle.v1.y(), triangle.v1.z(),
+                triangle.v2.x(), triangle.v2.y(), triangle.v2.z(),
+                triangle.v3.x(), triangle.v3.y(), triangle.v3.z()
             }, 3, 3);
 
             // Matrix transformedTriangleMatrix = triangleMatrix.multiply(rotationMatrix);

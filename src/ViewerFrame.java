@@ -7,7 +7,9 @@ import java.util.ArrayList;
 
 public class ViewerFrame extends JFrame {
     public ViewerFrame() {
-        setSize(400, 400);
+        setSize(512, 512);
+        setResizable(false);
+        setLayout(new GridBagLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -21,16 +23,47 @@ public class ViewerFrame extends JFrame {
         menuBar.add(fileMenu);
         setJMenuBar(menuBar);
 
+        GridBagConstraints c = new GridBagConstraints();
+
         JSlider yawSlider = new JSlider(JSlider.HORIZONTAL, 0, 360, 180);
-        add(yawSlider, BorderLayout.SOUTH);
+        yawSlider.setToolTipText("Rotation around Oy");
+
+        c.gridx = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridy = 1;
+        c.gridwidth = 3;
+        c.weightx = 0;
+        c.weighty = 0;
+        add(yawSlider, c);
 
         JSlider pitchSlider = new JSlider(JSlider.VERTICAL, 0, 360, 180);
-        add(pitchSlider, BorderLayout.EAST);
+        pitchSlider.setToolTipText("Rotation around Ox");
+
+        c.gridx = 2;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        c.weighty = 0;
+        add(pitchSlider, c);
 
         JSlider rollSlider = new JSlider(JSlider.VERTICAL, 0, 360, 180);
-        add(rollSlider, BorderLayout.WEST);
+        rollSlider.setToolTipText("Rotation around Oz");
+
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0;
+        c.weighty = 0;
+        add(rollSlider, c);
 
         RenderPanel renderPanel = new RenderPanel(yawSlider, pitchSlider, rollSlider);
+
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        add(renderPanel, c);
+
+        pack();
 
         openFileMenuItem.addActionListener(action -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -57,7 +90,6 @@ public class ViewerFrame extends JFrame {
             renderPanel.repaint();
         });
 
-        add(renderPanel, BorderLayout.CENTER);
 
         setVisible(true);
     }

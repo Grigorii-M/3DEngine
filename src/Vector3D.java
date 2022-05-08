@@ -1,14 +1,9 @@
-import java.util.Arrays;
-
 public class Vector3D {
     private final double[] values;
     private Double magnitude = null;
 
-    public Vector3D(double... values) {
-        if (values.length != 3) {
-            throw new IllegalArgumentException("");
-        }
-        this.values = values;
+    public Vector3D(double x, double y, double z) {
+        this.values = new double[] {x, y, z};
     }
 
     public double x() {
@@ -30,7 +25,7 @@ public class Vector3D {
         newValues[1] = vector1.values[2] * vector2.values[0] - vector1.values[0] * vector2.values[2];
         newValues[2] = vector1.values[0] * vector2.values[1] - vector1.values[1] * vector2.values[0];
 
-        return new Vector3D(newValues);
+        return new Vector3D(newValues[0], newValues[1], newValues[2]);
     }
 
     public double getMagnitude() {
@@ -53,7 +48,7 @@ public class Vector3D {
             newValues[i] = values[i] / getMagnitude();
         }
 
-        return new Vector3D(newValues);
+        return new Vector3D(newValues[0], newValues[1], newValues[2]);
     }
 
     public double dotProduct(Vector3D vector) {
@@ -69,12 +64,30 @@ public class Vector3D {
         return dotProduct;
     }
 
-    /**
-     * @return new Vector3D of the size of the input vector with all values set to 0
-     */
-    public static Vector3D one(Vector3D vector) {
-        double[] newValues = new double[vector.values.length];
-        Arrays.fill(newValues, 1);
-        return new Vector3D(newValues);
+    public double multiply(Vector3D v) {
+        double res = 0;
+        for (int i = 0; i < values.length; i++) {
+            res += v.values[i] * values[i];
+        }
+
+        return res;
+    }
+
+    public Vector3D applyTransformation(Matrix transformation) {
+        double[] newValues = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            double value = 0;
+            for (int j = 0; j < transformation.getRows(); j++) {
+                value += (j < values.length ? values[j] : 1) * transformation.get(j, i);
+            }
+            newValues[i] = value;
+        }
+
+        return new Vector3D(newValues[0], newValues[1], newValues[2]);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + values[0] + ", " + values[1] + ", " + values[2] + "]";
     }
 }

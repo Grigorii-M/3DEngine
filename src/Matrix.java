@@ -9,14 +9,13 @@ import static java.lang.Math.sin;
  * Class representing two-dimensional matrices of real values
  */
 public class Matrix {
-    private final double[] values;
+    protected final double[] values;
 
     private final int rows;
     private final int columns;
 
     private Double determinant = null;
     private final boolean isSquare;
-    private final boolean isVector;
 
     public Matrix(List<Double> values, int rows, int columns) {
         this(values.stream().mapToDouble(n -> n).toArray(), rows, columns);
@@ -24,17 +23,15 @@ public class Matrix {
 
     public Matrix(double[] values, int rows, int columns) {
         if (values.length != rows * columns) {
-            //throw new IllegalArgumentException("Matrix dimensions do not correspond to the values given");
-            System.out.println("ERROR");
-            System.out.println(values.length + " != " + rows + " * " + columns);
+            throw new IllegalArgumentException("Matrix dimensions do not correspond to the values given");
+        } else if (rows == 1 || columns == 1) {
+            throw new IllegalArgumentException("Use Vector3D class to create a vector");
         }
 
         this.values = values;
         this.rows = rows;
         this.columns = columns;
-
         isSquare = this.rows == this.columns;
-        isVector = this.rows == 1 || this.columns == 1;
     }
 
     @Override
@@ -60,9 +57,7 @@ public class Matrix {
 
     public Matrix add(Matrix matrix) {
         if (!Arrays.equals(this.getDimensions(), matrix.getDimensions())) {
-            //throw new IllegalArgumentException("Dimensions of matrices do not match");
-            System.out.println("ERROR");
-            return null;
+            throw new IllegalArgumentException("Dimensions of matrices do not match");
         }
 
         double[] addedValues = Arrays.copyOf(this.values, values.length);
@@ -77,6 +72,14 @@ public class Matrix {
         return new int[] {rows, columns};
     }
 
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
+    }
+
     public Matrix multiply(double scalar) {
         List<Double> multiplied = Arrays.stream(this.values).boxed().collect(Collectors.toList());
         multiplied.replaceAll(integer -> integer * scalar);
@@ -85,7 +88,7 @@ public class Matrix {
 
     public Matrix multiply(Matrix matrix) {
         if (columns != matrix.rows) {
-            return null;
+            throw new IllegalArgumentException("Matrices cannot be multiplied: this.columns != matrix.rows");
         }
 
         double[] newValues = new double[this.rows * matrix.columns];
@@ -120,6 +123,10 @@ public class Matrix {
     }
 
     private double calculateDeterminant() {
+        if (!isSquare) {
+            throw new ArithmeticException("Matrix should be square to compute determinant");
+        }
+
         if (this.rows == 1 && this.columns == 1) {
             return this.get(0, 0);
         } else if (this.rows == 2 && this.columns == 2) {
@@ -160,6 +167,7 @@ public class Matrix {
         if (rows != columns) {
             throw new RuntimeException("Non square matrix does not have a determinant");
         }
+
         if (determinant == null) {
             determinant = this.calculateDeterminant();
         }
@@ -189,11 +197,8 @@ public class Matrix {
         return new Matrix(cofactors, rows, columns);
     }
 
-    /**
-     * @param angle angle to rotate in degrees
-     */
-    public static Matrix getXYRotationMatrix(double angle) {
-        double radAngle = Math.toRadians(angle);
+    public static Matrix getXYRotationMatrix(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 cos(radAngle), -sin(radAngle), 0,
                 sin(radAngle), cos(radAngle), 0,
@@ -201,11 +206,8 @@ public class Matrix {
         }, 3, 3);
     }
 
-    /**
-     * @param angle angle to rotate in degrees
-     */
-    public static Matrix getYZRotationMatrix(double angle) {
-        double radAngle = Math.toRadians(angle);
+    public static Matrix getYZRotationMatrix(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 1, 0, 0,
                 0, cos(radAngle), sin(radAngle),
@@ -213,11 +215,8 @@ public class Matrix {
         }, 3, 3);
     }
 
-    /**
-     * @param angle angle to rotate in degrees
-     */
-    public static Matrix getYZRotationMatrixAlt(double angle) {
-        double radAngle = Math.toRadians(angle);
+    public static Matrix getYZRotationMatrixAlt(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 1, 0, 0,
                 0, cos(radAngle), -sin(radAngle),
@@ -225,11 +224,8 @@ public class Matrix {
         }, 3, 3);
     }
 
-    /**
-     * @param angle angle to rotate in degrees
-     */
-    public static Matrix getXZRotationMatrix(double angle) {
-        double radAngle = Math.toRadians(angle);
+    public static Matrix getXZRotationMatrix(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 cos(radAngle), 0, -sin(radAngle),
                 0, 1, 0,
@@ -237,11 +233,8 @@ public class Matrix {
         }, 3, 3);
     }
 
-    /**
-     * @param angle angle to rotate in degrees
-     */
-    public static Matrix getXZRotationMatrixAlt(double angle) {
-        double radAngle = Math.toRadians(angle);
+    public static Matrix getXZRotationMatrixAlt(double degAngle) {
+        double radAngle = Math.toRadians(degAngle);
         return new Matrix(new double[] {
                 cos(radAngle), 0, sin(radAngle),
                 0, 1, 0,

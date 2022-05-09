@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Vector3D {
     private final double[] values;
     private Double magnitude = null;
@@ -84,6 +87,50 @@ public class Vector3D {
         }
 
         return new Vector3D(newValues[0], newValues[1], newValues[2]);
+    }
+
+    /**
+     * Sum over the edges, (x2 − x1)(y2 + y1).
+     * If the result is positive the curve is clockwise, if it's negative the curve is counter-clockwise.
+     * (The result is twice the enclosed area, with a +/- convention.)
+     */
+    public static boolean isClockwise(ArrayList<Vector3D> points) {
+        double sum = 0;
+        for (int i = 1; i < points.size(); i++) {
+            sum += (points.get(i).x() - points.get(i - 1).x()) * (points.get(i).y() + points.get(i - 1).y());
+        }
+        sum += (points.get(0).x() - points.get(points.size() - 1).x()) * (points.get(0).y() + points.get(points.size() - 1).y());
+        return sum > 0;
+    }
+
+    public static Vector3D findCentroid(List<Vector3D> points) {
+        double x = 0, y = 0, z = 0;
+        for (Vector3D p : points) {
+            x += p.x();
+            y += p.y();
+            z += p.z();
+        }
+        return new Vector3D(x / points.size(), y / points.size(), z / points.size());
+    }
+
+    public static ArrayList<Vector3D> sortPointsInCounterClockwiseFashion(ArrayList<Vector3D> points) {
+        Vector3D center = findCentroid(points);
+        points.sort((a, b) -> {
+            double a1 = (Math.toDegrees(Math.atan2(a.x() - center.x(), a.y() - center.y())) + 360) % 360;
+            double a2 = (Math.toDegrees(Math.atan2(b.x() - center.x(), b.y() - center.y())) + 360) % 360;
+            return (int) (a2 - a1);
+        });
+        return points;
+    }
+
+    public static ArrayList<Vector3D> sortPointsInClockwiseFashion(ArrayList<Vector3D> points) {
+        Vector3D center = findCentroid(points);
+        points.sort((a, b) -> {
+            double a1 = (Math.toDegrees(Math.atan2(a.x() - center.x(), a.y() - center.y())) + 360) % 360;
+            double a2 = (Math.toDegrees(Math.atan2(b.x() - center.x(), b.y() - center.y())) + 360) % 360;
+            return (int) (a1 - a2);
+        });
+        return points;
     }
 
     @Override

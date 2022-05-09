@@ -17,6 +17,10 @@ public final class Vertex {
         this.z = z;
     }
 
+    public Vector3D getAsVector3D() {
+        return new Vector3D(x, y, z);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;

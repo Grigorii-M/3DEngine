@@ -1,3 +1,5 @@
+import ui.ViewerFrame;
+
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 

@@ -1,21 +1,23 @@
+package maths;
+
 import java.awt.*;
 import java.util.Objects;
 import java.util.Random;
 
-public final class Triangle {
-    public final Vertex v0;
-    public final Vertex v1;
-    public final Vertex v2;
+public class Triangle {
+    public final Vector3 v0;
+    public final Vector3 v1;
+    public final Vector3 v2;
     public final Color color;
 
-    public Triangle(Vertex v0, Vertex v1, Vertex v2, Color color) {
+    public Triangle(Vector3 v0, Vector3 v1, Vector3 v2, Color color) {
         this.v0 = v0;
         this.v1 = v1;
         this.v2 = v2;
         this.color = color;
     }
 
-    public Triangle(Vertex v0, Vertex v1, Vertex v2) {
+    public Triangle(Vector3 v0, Vector3 v1, Vector3 v2) {
         this(v0, v1, v2, getRandomColor());
     }
 
@@ -24,17 +26,24 @@ public final class Triangle {
         return new Color(random.nextFloat(1), random.nextFloat(1), random.nextFloat(1));
     }
 
-    public static boolean edgeFunction(Vertex v0, Vertex v1, Vector2D point) {
+    public static double edgeFunction(Vector3 v0, Vector3 v1, Vector3 point) {
         Matrix m = new Matrix(new double[] {
-                point.x() - v0.x, point.y() - v0.y,
+                point.x - v0.x, point.y - v0.y,
                 v1.x - v0.x, v1.y - v0.y}, 2, 2);
-        return m.getDeterminant() > 0;
+        return m.getDeterminant();
     }
 
-    public Vector3D getNormal() {
-        Vector3D vectorA = new Vector3D(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z);
-        Vector3D vectorB = new Vector3D(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-        return Vector3D.crossProduct(vectorA, vectorB);
+    public static double edgeFunction(Vector3 v0, Vector3 v1, Vector2 point) {
+        Matrix m = new Matrix(new double[] {
+                point.x - v0.x, point.y - v0.y,
+                v1.x - v0.x, v1.y - v0.y}, 2, 2);
+        return m.getDeterminant();
+    }
+
+    public Vector3 getNormal() {
+        Vector3 vectorA = new Vector3(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z);
+        Vector3 vectorB = new Vector3(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
+        return Vector3.crossProduct(vectorA, vectorB);
     }
 
     @Override
@@ -55,7 +64,7 @@ public final class Triangle {
 
     @Override
     public String toString() {
-        return "Triangle[" +
+        return "maths.Triangle[" +
                 "v0=" + v0 + ", " +
                 "v1=" + v1 + ", " +
                 "v2=" + v2 + ", " +

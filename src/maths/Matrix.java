@@ -1,3 +1,5 @@
+package maths;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,9 +25,9 @@ public class Matrix {
 
     public Matrix(double[] values, int rows, int columns) {
         if (values.length != rows * columns) {
-            throw new IllegalArgumentException("Matrix dimensions do not correspond to the values given");
+            throw new IllegalArgumentException("maths.Matrix dimensions do not correspond to the values given");
         } else if (rows == 1 || columns == 1) {
-            throw new IllegalArgumentException("Use Vector3D class to create a vector");
+            throw new IllegalArgumentException("Use maths.Vector3 class to create a vector");
         }
 
         this.values = values;
@@ -124,7 +126,7 @@ public class Matrix {
 
     private double calculateDeterminant() {
         if (!isSquare) {
-            throw new ArithmeticException("Matrix should be square to compute determinant");
+            throw new ArithmeticException("maths.Matrix should be square to compute determinant");
         }
 
         if (this.rows == 1 && this.columns == 1) {

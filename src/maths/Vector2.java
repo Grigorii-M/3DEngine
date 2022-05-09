@@ -1,17 +1,19 @@
-public class Vector2D {
+package maths;
+
+public class Vector2 {
     private final double[] values;
+    public final double x;
+    public final double y;
     private Double magnitude = null;
 
-    public Vector2D(double x, double y) {
+    public Vector2(double x, double y) {
         this.values = new double[] {x, y};
+        this.x = x;
+        this.y = y;
     }
 
-    public double x() {
-        return values[0];
-    }
-
-    public double y() {
-        return values[1];
+    public Vector3 getAsVector3() {
+        return new Vector3(x, y, 0);
     }
 
     public double getMagnitude() {
@@ -28,16 +30,16 @@ public class Vector2D {
         return magnitude;
     }
 
-    public Vector2D normalize() {
+    public Vector2 normalize() {
         double[] newValues = new double[values.length];
         for (int i = 0; i < newValues.length; i++) {
             newValues[i] = values[i] / getMagnitude();
         }
 
-        return new Vector2D(newValues[0], newValues[1]);
+        return new Vector2(newValues[0], newValues[1]);
     }
 
-    public double dotProduct(Vector2D vector) {
+    public double dotProduct(Vector2 vector) {
         if (values.length != vector.values.length) {
             throw new IllegalArgumentException("Vectors are not of the same length");
         }
@@ -50,16 +52,7 @@ public class Vector2D {
         return dotProduct;
     }
 
-    public double multiply(Vector2D v) {
-        double res = 0;
-        for (int i = 0; i < values.length; i++) {
-            res += v.values[i] * values[i];
-        }
-
-        return res;
-    }
-
-    public Vector2D applyTransformation(Matrix transformation) {
+    public Vector2 applyTransformation(Matrix transformation) {
         double[] newValues = new double[values.length];
         for (int i = 0; i < values.length; i++) {
             double value = 0;
@@ -69,16 +62,11 @@ public class Vector2D {
             newValues[i] = value;
         }
 
-        return new Vector2D(newValues[0], newValues[1]);
+        return new Vector2(newValues[0], newValues[1]);
     }
 
     @Override
     public String toString() {
-        StringBuilder output = new StringBuilder("[");
-        for (double value : values) {
-            output.append(value).append(", ");
-        }
-        output.replace(output.length() - 2, output.length(), "]");
-        return String.valueOf(output);
+        return "[" + x + ", " + y + "]";
     }
 }

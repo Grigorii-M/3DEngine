@@ -1,3 +1,8 @@
+package parsers;
+
+import maths.Triangle;
+import maths.Vector3;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,11 +21,11 @@ public class OBJParser {
             byte[] bytes = fileInputStream.readAllBytes();
             String[] lines = new String(bytes, StandardCharsets.UTF_8).split("\n");
 
-            ArrayList<Vertex> vertices = new ArrayList<>();
+            ArrayList<Vector3> vertices = new ArrayList<>();
             for (String line : lines) {
                 if (line.matches("^v\\s+.*")) {
                     String[] terms = line.split("\\s+");
-                    Vertex v = new Vertex(Double.parseDouble(terms[1]), Double.parseDouble(terms[2]), Double.parseDouble(terms[3]));
+                    Vector3 v = new Vector3(Double.parseDouble(terms[1]), Double.parseDouble(terms[2]), Double.parseDouble(terms[3]));
                     vertices.add(v);
                 }
 

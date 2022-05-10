@@ -15,20 +15,7 @@ import java.util.List;
 public class RenderPanel extends JPanel {
     private PinholeRasterCamera camera;
 
-    // Fancy camera position
-    private final Matrix cameraToWorld = new Matrix(new double[] {
-            0.871214, 0, -0.490904, 0,
-            -0.192902, 0.919559, -0.342346, 0,
-            0.451415, 0.392953, 0.801132, 0,
-            14.777467, 29.361945, 27.993464, 1}, 4, 4);
-
-//    private final maths.Matrix cameraToWorld = new maths.Matrix(new double[] {
-//            1, 0, 0, 0,
-//            0, 1, 0, 0,
-//            0, 1, 1, 0,
-//            0, 3, 3, 1}, 4, 4)
-
-    private final Matrix woldToCamera = cameraToWorld.getInverse();
+    private final Matrix woldToCamera;
     private ArrayList<Triangle> currentObject;
 
     private final JSlider yawSlider;
@@ -49,6 +36,7 @@ public class RenderPanel extends JPanel {
         this.rollSlider = rollSlider;
         setPreferredSize(new Dimension(512, 512));
         camera = new PinholeRasterCamera();
+        woldToCamera = camera.getCameraMatrix().getInverse();
     }
 
     public void paintComponent(Graphics g) {
@@ -201,7 +189,6 @@ public class RenderPanel extends JPanel {
                 (1 - vertexNormalized.y) / 2 * camera.getImageHeight(),
                 -vertexInCameraSpace.z // Store z value (depth) for z-buffering later
         );
-        System.out.println(vertexNormalized + " -> " + vertexRaster);
         return vertexRaster;
     }
 
@@ -333,5 +320,9 @@ public class RenderPanel extends JPanel {
 
     public void setShowBoundingBoxes(boolean showBoundingBoxes) {
         this.showBoundingBoxes = showBoundingBoxes;
+    }
+
+    public PinholeRasterCamera getCamera() {
+        return camera;
     }
 }

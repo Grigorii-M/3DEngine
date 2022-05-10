@@ -7,12 +7,15 @@ import util.UnitsConverter;
  * Model of a pinhole camera for rasterization algorithm
  */
 public class PinholeRasterCamera {
-    private final double focalLength = 20; // in mm
+    private double focalLength = 20; // in mm
+    private double fieldOfView; // horizontal
+
+    public enum CameraSetupMode {
+        FOCAL_LENGTH, FIELD_OF_VIEW
+    }
 
     private double filmApertureWidth = 0.825;
     private double filmApertureHeight = 0.446;
-
-    private double fieldOfView;
 
     private double nearClippingPlane = 1;
     private double farClippingPlane = 1000;
@@ -25,16 +28,35 @@ public class PinholeRasterCamera {
     public enum FitResolutionGate {
         FILL, OVERSCAN
     }
-    private Matrix cameraToWorld;
+
+    private ProjectionType projectionType = ProjectionType.PERSPECTIVE;
+    public enum ProjectionType {
+        PERSPECTIVE, ORTHOGRAPHIC
+    }
+
+    private Matrix cameraToWorld = new Matrix(new double[] {
+        0.871214, 0, -0.490904, 0,
+                -0.192902, 0.919559, -0.342346, 0,
+                0.451415, 0.392953, 0.801132, 0,
+                14.777467, 29.361945, 27.993464, 1}, 4, 4);
 
     private double xScale = 1;
     private double yScale = 1;
 
-    // Perspective projection matrix works is based on implicitly setting up the image plane at the near clipping plane
+    // Perspective projection matrix algorithm is based on implicitly setting up the image plane at the near clipping plane
     private double distanceToCanvas = nearClippingPlane;
 
     private double filmAspectRatio;
     private double deviceAspectRatio;
+
+    public enum AspectRatio {
+        RATIO_4X3,
+        RATIO_5X3,
+        RATIO_5X4,
+        RATIO_1X1,
+        RATIO_16X9,
+        FREE
+    }
 
     private double canvasTop;
     private double canvasBottom;
@@ -51,6 +73,7 @@ public class PinholeRasterCamera {
         filmAspectRatio = filmApertureWidth / filmApertureHeight;
         deviceAspectRatio = imageWidth / (double) imageHeight;
 
+        fieldOfView = 2 * Math.toDegrees(Math.atan((filmApertureWidth * UnitsConverter.inchToMm / 2) / focalLength));
 
         switch (fitResolutionGate) {
             case FILL -> {
@@ -76,8 +99,20 @@ public class PinholeRasterCamera {
         canvasBottom = -canvasTop;
     }
 
+    public void setProjectionType(ProjectionType projectionType) {
+        this.projectionType = projectionType;
+    }
+
+    public void setNearClippingPlane(double nearClippingPlane) {
+        this.nearClippingPlane = nearClippingPlane;
+    }
+
     public double getNearClippingPlane() {
         return nearClippingPlane;
+    }
+
+    public void setFarClippingPlane(double farClippingPlane) {
+        this.farClippingPlane = farClippingPlane;
     }
 
     public double getFarClippingPlane() {
@@ -90,6 +125,44 @@ public class PinholeRasterCamera {
 
     public int getImageHeight() {
         return imageHeight;
+    }
+
+    public double getFocalLength() {
+        return focalLength;
+    }
+
+    public void setFocalLength(double focalLength) {
+        this.focalLength = focalLength;
+        this.fieldOfView = 2 * Math.toDegrees(Math.atan((filmApertureWidth * UnitsConverter.inchToMm / 2) / this.focalLength));
+    }
+
+    public double getFieldOfView() {
+        return fieldOfView;
+    }
+
+    public void setFieldOfView(double fieldOfView) {
+        this.fieldOfView = fieldOfView;
+        this.focalLength = filmApertureWidth * UnitsConverter.inchToMm / (2 * Math.toRadians(this.fieldOfView / 2));
+    }
+
+    public double getFilmApertureWidth() {
+        return filmApertureWidth;
+    }
+
+    public void setFilmApertureWidth(double filmApertureWidth) {
+        this.filmApertureWidth = filmApertureWidth;
+    }
+
+    public double getFilmApertureHeight() {
+        return filmApertureHeight;
+    }
+
+    public void setFilmApertureHeight(double filmApertureHeight) {
+        this.filmApertureHeight = filmApertureHeight;
+    }
+
+    public void setFitResolutionGate(FitResolutionGate value) {
+        this.fitResolutionGate = value;
     }
 
     public double getCanvasTop() {
@@ -106,5 +179,9 @@ public class PinholeRasterCamera {
 
     public double getCanvasLeft() {
         return canvasLeft;
+    }
+
+    public Matrix getCameraMatrix() {
+        return cameraToWorld;
     }
 }

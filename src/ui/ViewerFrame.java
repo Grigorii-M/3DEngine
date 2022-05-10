@@ -20,7 +20,6 @@ public class ViewerFrame extends JFrame {
 
         JMenu fileMenu = new JMenu("File");
         JMenuItem openFileMenuItem = new JMenuItem("Open");
-        openFileMenuItem.setIcon(UIManager.getIcon("FileView.fileIcon"));
         openFileMenuItem.addActionListener(action -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Select active directory");
@@ -35,28 +34,33 @@ public class ViewerFrame extends JFrame {
         fileMenu.add(openFileMenuItem);
 
         JMenu viewMenu = new JMenu("View");
-        JCheckBoxMenuItem showWireframe = new JCheckBoxMenuItem("Wireframe");
-        showWireframe.addActionListener(l -> {
-            renderPanel.setShowWireframe(showWireframe.getState());
+        JCheckBoxMenuItem showWireframeMenuItem = new JCheckBoxMenuItem("Wireframe");
+        showWireframeMenuItem.addActionListener(l -> {
+            renderPanel.setShowWireframe(showWireframeMenuItem.getState());
             renderPanel.repaint();
         });
-        JCheckBoxMenuItem showFaces = new JCheckBoxMenuItem("Faces");
-        showFaces.setState(true);
-        showFaces.addActionListener(l -> {
-            renderPanel.setShowFaces(showFaces.getState());
+        JCheckBoxMenuItem showFacesMenuItem = new JCheckBoxMenuItem("Faces");
+        showFacesMenuItem.setState(true);
+        showFacesMenuItem.addActionListener(l -> {
+            renderPanel.setShowFaces(showFacesMenuItem.getState());
             renderPanel.repaint();
         });
-        JCheckBoxMenuItem showBoundingBoxes = new JCheckBoxMenuItem("Bounding boxes");
-        showBoundingBoxes.addActionListener(l -> {
-            renderPanel.setShowBoundingBoxes(showBoundingBoxes.getState());
+        JCheckBoxMenuItem showBoundingBoxesMenuItem = new JCheckBoxMenuItem("Bounding boxes");
+        showBoundingBoxesMenuItem.addActionListener(l -> {
+            renderPanel.setShowBoundingBoxes(showBoundingBoxesMenuItem.getState());
             renderPanel.repaint();
         });
-        viewMenu.add(showWireframe);
-        viewMenu.add(showFaces);
-        viewMenu.add(showBoundingBoxes);
+        viewMenu.add(showWireframeMenuItem);
+        viewMenu.add(showFacesMenuItem);
+        viewMenu.add(showBoundingBoxesMenuItem);
 
         JMenu cameraMenu = new JMenu("Camera");
 
+        JMenuItem editRasterCameraMenuItem = new JMenuItem("Raster camera");
+        editRasterCameraMenuItem.addActionListener(l -> {
+            SwingUtilities.invokeLater(() -> new RasterCameraSettingsFrame(renderPanel.getCamera(), editRasterCameraMenuItem));
+        });
+        cameraMenu.add(editRasterCameraMenuItem);
 
         menuBar.add(fileMenu);
         menuBar.add(viewMenu);

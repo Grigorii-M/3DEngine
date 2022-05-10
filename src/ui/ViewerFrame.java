@@ -55,8 +55,12 @@ public class ViewerFrame extends JFrame {
         viewMenu.add(showFaces);
         viewMenu.add(showBoundingBoxes);
 
+        JMenu cameraMenu = new JMenu("Camera");
+
+
         menuBar.add(fileMenu);
         menuBar.add(viewMenu);
+        menuBar.add(cameraMenu);
         setJMenuBar(menuBar);
 
         GridBagConstraints c = new GridBagConstraints();

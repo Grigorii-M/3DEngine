@@ -1,5 +1,6 @@
 package ui;
 
+import cameras.PinholeRasterCamera;
 import maths.*;
 
 import javax.swing.*;
@@ -7,9 +8,13 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+// Todo: transfer rasterization algorithm into another class
 public class RenderPanel extends JPanel {
+    private PinholeRasterCamera camera;
+
     // Fancy camera position
     private final Matrix cameraToWorld = new Matrix(new double[] {
             0.871214, 0, -0.490904, 0,
@@ -21,7 +26,8 @@ public class RenderPanel extends JPanel {
 //            1, 0, 0, 0,
 //            0, 1, 0, 0,
 //            0, 1, 1, 0,
-//            0, 3, 3, 1}, 4, 4);
+//            0, 3, 3, 1}, 4, 4)
+
     private final Matrix woldToCamera = cameraToWorld.getInverse();
     private ArrayList<Triangle> currentObject;
 
@@ -33,9 +39,6 @@ public class RenderPanel extends JPanel {
     private boolean showFaces = true;
     private boolean showBoundingBoxes = false;
 
-    // Distance from the 'eye' to the screen
-    private final double nearClippingPlane = 1;
-
     // FOV ???
     double canvasWidth = 2;
     double canvasHeight = 2;
@@ -45,6 +48,7 @@ public class RenderPanel extends JPanel {
         this.pitchSlider = pitchSlider;
         this.rollSlider = rollSlider;
         setPreferredSize(new Dimension(512, 512));
+        camera = new PinholeRasterCamera();
     }
 
     public void paintComponent(Graphics g) {
@@ -63,6 +67,11 @@ public class RenderPanel extends JPanel {
         }
 
         BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        double[][] depthBuffer = new double[image.getHeight()][image.getWidth()];
+        for (double[] doubles : depthBuffer) {
+            Arrays.fill(doubles, Double.POSITIVE_INFINITY);
+        }
+
         for (Triangle triangle : currentObject) {
             // Get triangle vertices as vectors
             Vector3 v0Space = triangle.v0;
@@ -76,21 +85,21 @@ public class RenderPanel extends JPanel {
             v2Space = v2Space.multiplyByMatrix(rotationMatrix);
 
             // Get raster coordinates
-            Vector3 v0Raster = computePixelCoordinates(v0Space);
-            Vector3 v1Raster = computePixelCoordinates(v1Space);
-            Vector3 v2Raster = computePixelCoordinates(v2Space);
-            ArrayList<Vector3> points = new ArrayList<>(List.of(v0Raster, v1Raster, v2Raster));
+            Vector3 v0Raster = convertToRaster(v0Space);
+            Vector3 v1Raster = convertToRaster(v1Space);
+            Vector3 v2Raster = convertToRaster(v2Space);
+            ArrayList<Vector3> triangleVerticesRaster = new ArrayList<>(List.of(v0Raster, v1Raster, v2Raster));
 
             // Ensure that vertices are in a counterclockwise order
-            if (Vector3.isClockwise(points)) {
-                Vector3.sortPointsInClockwiseFashion(points); // Using this because screen y coordinate is flipped
+            if (Vector3.isClockwise(triangleVerticesRaster)) {
+                Vector3.sortPointsInClockwiseFashion(triangleVerticesRaster); // Using this because screen y coordinate is flipped
             }
 
             // Compute bounding box
-            double boundingBoxXMin = Math.min(points.get(0).x, Math.min(points.get(1).x, points.get(2).x));
-            double boundingBoxXMax = Math.max(points.get(0).x, Math.max(points.get(1).x, points.get(2).x));
-            double boundingBoxYMin = Math.min(points.get(0).y, Math.min(points.get(1).y, points.get(2).y));
-            double boundingBoxYMax = Math.max(points.get(0).y, Math.max(points.get(1).y, points.get(2).y));
+            double boundingBoxXMin = Math.min(triangleVerticesRaster.get(0).x, Math.min(triangleVerticesRaster.get(1).x, triangleVerticesRaster.get(2).x));
+            double boundingBoxXMax = Math.max(triangleVerticesRaster.get(0).x, Math.max(triangleVerticesRaster.get(1).x, triangleVerticesRaster.get(2).x));
+            double boundingBoxYMin = Math.min(triangleVerticesRaster.get(0).y, Math.min(triangleVerticesRaster.get(1).y, triangleVerticesRaster.get(2).y));
+            double boundingBoxYMax = Math.max(triangleVerticesRaster.get(0).y, Math.max(triangleVerticesRaster.get(1).y, triangleVerticesRaster.get(2).y));
 
             // If bounding box is out of the screen, the triangle is not visible, therefore no need to proceed
             if (boundingBoxXMin > getWidth() - 1 || boundingBoxXMax < 0 || boundingBoxYMin > getHeight() - 1 || boundingBoxYMax < 0) {
@@ -109,7 +118,7 @@ public class RenderPanel extends JPanel {
             }
 
             // Get triangle area (multiplied by two) using edge function
-            double triangleArea2 = Triangle.edgeFunction(points.get(0), points.get(1), points.get(2));
+            double triangleArea2 = Triangle.edgeFunction(triangleVerticesRaster.get(0), triangleVerticesRaster.get(1), triangleVerticesRaster.get(2));
 
             // Draw wireframe
             if (showWireframe) {
@@ -123,23 +132,23 @@ public class RenderPanel extends JPanel {
                 graphics2D.draw(edgePath);
             }
 
-            if (showFaces && !Vector3.isClockwise(points)) {
+            if (showFaces && !Vector3.isClockwise(triangleVerticesRaster)) {
                 // Process only inside the bounding box
                 for (int y = yMin; y < yMax; y++) {
                     for (int x = xMin; x < xMax; x++) {
                         // Compute barycentric coordinates in order to check whether the point (x, y) lies within the triangle
                         Vector2 pixel = new Vector2(x, y);
-                        double w0 = Triangle.edgeFunction(points.get(1), points.get(2), pixel) / triangleArea2;
-                        double w1 = Triangle.edgeFunction(points.get(2), points.get(0), pixel) / triangleArea2;
-                        double w2 = Triangle.edgeFunction(points.get(0), points.get(1), pixel) / triangleArea2;
+                        double w0 = Triangle.edgeFunction(triangleVerticesRaster.get(1), triangleVerticesRaster.get(2), pixel) / triangleArea2;
+                        double w1 = Triangle.edgeFunction(triangleVerticesRaster.get(2), triangleVerticesRaster.get(0), pixel) / triangleArea2;
+                        double w2 = Triangle.edgeFunction(triangleVerticesRaster.get(0), triangleVerticesRaster.get(1), pixel) / triangleArea2;
 
-                        if (isPixelOverlapping(points, List.of(w0, w1, w2))) {
+                        if (isPixelOverlapping(triangleVerticesRaster, List.of(w0, w1, w2))) {
                             // For later
 //                            Vector3 barycentricCoordinates = new Vector3(w0, w1, w2);
 //                            Matrix triangleMatrix = new Matrix(new double[] {
-//                                    points.get(0).x, points.get(0).y, points.get(0).z,
-//                                    points.get(1).x, points.get(1).y, points.get(1).z,
-//                                    points.get(2).x, points.get(2).y, points.get(2).z,
+//                                    triangleVerticesRaster.get(0).x, triangleVerticesRaster.get(0).y, triangleVerticesRaster.get(0).z,
+//                                    triangleVerticesRaster.get(1).x, triangleVerticesRaster.get(1).y, triangleVerticesRaster.get(1).z,
+//                                    triangleVerticesRaster.get(2).x, triangleVerticesRaster.get(2).y, triangleVerticesRaster.get(2).z,
 //                            }, 3, 3);
 
                             image.setRGB(x, y, triangle.color.getRGB());
@@ -168,38 +177,32 @@ public class RenderPanel extends JPanel {
                 && ((barycentricCoordinates.get(2) == 0) ? ((edge2.y == 0 && edge2.x > 0) || edge2.y > 0) : barycentricCoordinates.get(2) > 0);
     }
 
-    private Vector3 computePixelCoordinates(Vector3 point) {
-        Vector3 pointInCameraSpace = point.multiplyByMatrix(woldToCamera);
-        Vector2 pointInScreenSpace = new Vector2(
-                nearClippingPlane * pointInCameraSpace.x / -pointInCameraSpace.z,
-                nearClippingPlane * pointInCameraSpace.y / -pointInCameraSpace.z
+    private Vector3 convertToRaster(Vector3 vertex) {
+        Vector3 vertexInCameraSpace = vertex.multiplyByMatrix(woldToCamera);
+        Vector2 vertexInScreenSpace = new Vector2(
+                camera.getNearClippingPlane() * vertexInCameraSpace.x / -vertexInCameraSpace.z,
+                camera.getNearClippingPlane() * vertexInCameraSpace.y / -vertexInCameraSpace.z
         );
 
-        // Normalize to [0, 1]
-//        maths.Vector2 pointNormalized = new maths.Vector2(
-//                (pointInScreenSpace.x() + canvasWidth / 2) / canvasWidth,
-//                (pointInScreenSpace.y() + canvasHeight / 2) / canvasHeight
-//        );
+        double r = camera.getCanvasRight();
+        double l = camera.getCanvasLeft();
+        double t = camera.getCanvasTop();
+        double b = camera.getCanvasBottom();
 
         // Normalize to [-1, 1]
-        double rightScreenCoordinate = getWidth() - 1;
-        double leftScreenCoordinate = 0;
-        double topScreenCoordinate = 0;
-        double bottomScreenCoordinate = getHeight() - 1;
-
-        Vector2 pointNormalized = new Vector2(
-                2 * pointInScreenSpace.x / (rightScreenCoordinate - leftScreenCoordinate)
-                        - (rightScreenCoordinate + leftScreenCoordinate) / (rightScreenCoordinate - leftScreenCoordinate),
-                2 * pointInScreenSpace.y / (topScreenCoordinate - bottomScreenCoordinate)
-                        - (topScreenCoordinate + bottomScreenCoordinate) / (topScreenCoordinate - bottomScreenCoordinate)
+        Vector2 vertexNormalized = new Vector2(
+                2 * vertexInScreenSpace.x / (r - l) - (r + l) / (r - l),
+                2 * vertexInScreenSpace.y / (t - b) - (t + b) / (t - b)
         );
 
         // Get raster coordinates
-        return new Vector3(
-                Math.floor((pointInScreenSpace.x + 1) / 2 * getWidth()),
-                Math.floor((1 - pointInScreenSpace.y) / 2 * getHeight()),
-                -pointInCameraSpace.z // Store z value (depth) for z-buffering later
+        Vector3 vertexRaster = new Vector3(
+                (vertexNormalized.x + 1) / 2 * camera.getImageWidth(),
+                (1 - vertexNormalized.y) / 2 * camera.getImageHeight(),
+                -vertexInCameraSpace.z // Store z value (depth) for z-buffering later
         );
+        System.out.println(vertexNormalized + " -> " + vertexRaster);
+        return vertexRaster;
     }
 
     public void setObjectToPaint(ArrayList<Triangle> triangles) {

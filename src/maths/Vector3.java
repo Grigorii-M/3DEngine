@@ -130,6 +130,10 @@ public class Vector3 {
         return new Vector3(x / points.size(), y / points.size(), z / points.size());
     }
 
+    /**
+     * Sorts list of vectors in counterclockwise fashion assuming that they are coplanar and their z coordinate is the same
+     * Works as intended in cartesian coordinate system with x pointing rightwards and y - upwards.
+     */
     public static void sortPointsInCounterClockwiseFashion(ArrayList<Vector3> points) {
         Vector3 center = findCentroid(points);
         points.sort((a, b) -> {
@@ -139,6 +143,10 @@ public class Vector3 {
         });
     }
 
+    /**
+     * Sorts list of vectors in clockwise fashion assuming that they are coplanar and their z coordinate is the same
+     * Works as intended in cartesian coordinate system with x pointing rightwards and y - upwards.
+     */
     public static void sortPointsInClockwiseFashion(ArrayList<Vector3> points) {
         Vector3 center = findCentroid(points);
         points.sort((a, b) -> {

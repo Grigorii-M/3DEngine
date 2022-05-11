@@ -72,7 +72,7 @@ public class RenderPanel extends JPanel {
             Vector3 v2Space = triangle.v2;
 
             // Apply transformation
-            // Todo: add zoom and translation
+            // Todo: add scaling and translation
             v0Space = v0Space.multiplyByMatrix(rotationMatrix);
             v1Space = v1Space.multiplyByMatrix(rotationMatrix);
             v2Space = v2Space.multiplyByMatrix(rotationMatrix);

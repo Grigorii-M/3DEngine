@@ -21,7 +21,6 @@ public class PinholeRasterCamera {
     private double farClippingPlane = 1000;
 
     // Image resolution in pixels
-    // Todo: set render panel dependent on these things
     private int imageWidth = 512;
     private int imageHeight = 512;
 

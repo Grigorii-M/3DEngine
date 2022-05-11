@@ -15,7 +15,7 @@ import java.util.List;
 public class RenderPanel extends JPanel {
     private PinholeRasterCamera camera;
 
-    private final Matrix woldToCamera;
+    private Matrix woldToCamera;
     private ArrayList<Triangle> currentObject;
 
     private final JSlider yawSlider;
@@ -30,16 +30,21 @@ public class RenderPanel extends JPanel {
     double canvasWidth = 2;
     double canvasHeight = 2;
 
-    public RenderPanel(JSlider yawSlider, JSlider pitchSlider, JSlider rollSlider) {
+    private final JFrame parentFrame;
+
+    public RenderPanel(JSlider yawSlider, JSlider pitchSlider, JSlider rollSlider, JFrame parentFrame) {
+        this.parentFrame = parentFrame;
         this.yawSlider = yawSlider;
         this.pitchSlider = pitchSlider;
         this.rollSlider = rollSlider;
         setPreferredSize(new Dimension(512, 512));
         camera = new PinholeRasterCamera();
-        woldToCamera = camera.getCameraMatrix().getInverse();
     }
 
     public void paintComponent(Graphics g) {
+        setPreferredSize(new Dimension((int) camera.getImageWidth(), (int) camera.getImageHeight()));
+        parentFrame.setSize(getPreferredSize());
+        woldToCamera = camera.getCameraMatrix().getInverse();
         Matrix xzRotation = Matrix.getXZRightHandedRotationMatrix(yawSlider.getValue());
         Matrix yzRotation = Matrix.getYZRightHandedRotationMatrixAlt(pitchSlider.getValue());
         Matrix xyRotation = Matrix.getXYRightHandedRotationMatrix(rollSlider.getValue());
@@ -57,7 +62,7 @@ public class RenderPanel extends JPanel {
         BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         double[][] depthBuffer = new double[image.getHeight()][image.getWidth()];
         for (double[] doubles : depthBuffer) {
-            Arrays.fill(doubles, Double.POSITIVE_INFINITY);
+            Arrays.fill(doubles, camera.getFarClippingPlane());
         }
 
         for (Triangle triangle : currentObject) {

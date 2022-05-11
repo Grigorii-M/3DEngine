@@ -57,9 +57,7 @@ public class ViewerFrame extends JFrame {
         JMenu cameraMenu = new JMenu("Camera");
 
         JMenuItem editRasterCameraMenuItem = new JMenuItem("Raster camera");
-        editRasterCameraMenuItem.addActionListener(l -> {
-            SwingUtilities.invokeLater(() -> new RasterCameraSettingsFrame(renderPanel.getCamera(), editRasterCameraMenuItem));
-        });
+        editRasterCameraMenuItem.addActionListener(l -> SwingUtilities.invokeLater(() -> new RasterCameraSettingsFrame(renderPanel.getCamera(), renderPanel)));
         cameraMenu.add(editRasterCameraMenuItem);
 
         menuBar.add(fileMenu);
@@ -111,7 +109,7 @@ public class ViewerFrame extends JFrame {
         c.weighty = 0;
         add(rollSlider, c);
 
-        renderPanel = new RenderPanel(yawSlider, pitchSlider, rollSlider);
+        renderPanel = new RenderPanel(yawSlider, pitchSlider, rollSlider, this);
 
         c.gridx = 1;
         c.gridy = 0;

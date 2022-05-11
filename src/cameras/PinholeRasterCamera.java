@@ -21,6 +21,7 @@ public class PinholeRasterCamera {
     private double farClippingPlane = 1000;
 
     // Image resolution in pixels
+    // Todo: set render panel dependent on these things
     private int imageWidth = 512;
     private int imageHeight = 512;
 
@@ -64,6 +65,10 @@ public class PinholeRasterCamera {
     private double canvasRight;
 
     public PinholeRasterCamera() {
+        calculateCanvas();
+    }
+
+    private void calculateCanvas() {
         canvasTop = ((filmApertureHeight * UnitsConverter.inchToMm / 2) / focalLength) * nearClippingPlane;
         canvasBottom = -canvasTop;
 
@@ -75,6 +80,7 @@ public class PinholeRasterCamera {
 
         fieldOfView = 2 * Math.toDegrees(Math.atan((filmApertureWidth * UnitsConverter.inchToMm / 2) / focalLength));
 
+        // Todo: fix this motherfucker
         switch (fitResolutionGate) {
             case FILL -> {
                 if (filmAspectRatio > deviceAspectRatio) {
@@ -119,14 +125,6 @@ public class PinholeRasterCamera {
         return farClippingPlane;
     }
 
-    public int getImageWidth() {
-        return imageWidth;
-    }
-
-    public int getImageHeight() {
-        return imageHeight;
-    }
-
     public double getFocalLength() {
         return focalLength;
     }
@@ -134,6 +132,7 @@ public class PinholeRasterCamera {
     public void setFocalLength(double focalLength) {
         this.focalLength = focalLength;
         this.fieldOfView = 2 * Math.toDegrees(Math.atan((filmApertureWidth * UnitsConverter.inchToMm / 2) / this.focalLength));
+        calculateCanvas();
     }
 
     public double getFieldOfView() {
@@ -142,7 +141,8 @@ public class PinholeRasterCamera {
 
     public void setFieldOfView(double fieldOfView) {
         this.fieldOfView = fieldOfView;
-        this.focalLength = filmApertureWidth * UnitsConverter.inchToMm / (2 * Math.toRadians(this.fieldOfView / 2));
+        this.focalLength = filmApertureWidth * UnitsConverter.inchToMm / (2 * Math.tan(Math.toRadians(this.fieldOfView / 2)));
+        calculateCanvas();
     }
 
     public double getFilmApertureWidth() {
@@ -151,6 +151,7 @@ public class PinholeRasterCamera {
 
     public void setFilmApertureWidth(double filmApertureWidth) {
         this.filmApertureWidth = filmApertureWidth;
+        calculateCanvas();
     }
 
     public double getFilmApertureHeight() {
@@ -159,10 +160,30 @@ public class PinholeRasterCamera {
 
     public void setFilmApertureHeight(double filmApertureHeight) {
         this.filmApertureHeight = filmApertureHeight;
+        calculateCanvas();
+    }
+
+    public double getImageWidth() {
+        return imageWidth;
+    }
+
+    public void setImageWidth(int imageWidth) {
+        this.imageWidth = imageWidth;
+        calculateCanvas();
+    }
+
+    public double getImageHeight() {
+        return imageHeight;
+    }
+
+    public void setImageHeight(int imageHeight) {
+        this.imageHeight = imageHeight;
+        calculateCanvas();
     }
 
     public void setFitResolutionGate(FitResolutionGate value) {
         this.fitResolutionGate = value;
+        calculateCanvas();
     }
 
     public double getCanvasTop() {
@@ -183,5 +204,14 @@ public class PinholeRasterCamera {
 
     public Matrix getCameraMatrix() {
         return cameraToWorld;
+    }
+
+    public void setCameraMatrix(Matrix matrix) {
+        if (!(matrix.getColumns() == matrix.getRows() && matrix.getRows() == 4)) {
+            throw new IllegalArgumentException("Camera matrix should be 4x4");
+        }
+
+        this.cameraToWorld = matrix;
+        calculateCanvas();
     }
 }

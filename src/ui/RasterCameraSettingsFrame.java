@@ -7,18 +7,14 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Objects;
-
-// Todo: ensure that the user can only enter numbers
 public class RasterCameraSettingsFrame extends JFrame {
 
-    private PinholeRasterCamera camera;
+    private final PinholeRasterCamera camera;
     private final JPanel renderPanel;
 
-    DecimalFormat df = new DecimalFormat("####.##");
+    DecimalFormat decimalFormat = new DecimalFormat("####.##");
 
     public RasterCameraSettingsFrame(PinholeRasterCamera camera, JPanel renderPanel) {
         this.camera = camera;
@@ -64,7 +60,7 @@ public class RasterCameraSettingsFrame extends JFrame {
         lensPanel.add(projectionTypeComboBox, c);
 
         JComboBox<PinholeRasterCamera.CameraSetupMode> cameraSetupModeJComboBox = new JComboBox<>(PinholeRasterCamera.CameraSetupMode.values());
-        cameraSetupModeJComboBox.setEditable(false);
+        cameraSetupModeJComboBox.setSelectedItem(PinholeRasterCamera.CameraSetupMode.FIELD_OF_VIEW);
 
         c.gridx = 0;
         c.gridy = 3;
@@ -75,18 +71,18 @@ public class RasterCameraSettingsFrame extends JFrame {
 
         JPanel focalLengthPanel = new JPanel(new GridBagLayout());
         JSlider focalLengthSlider = new JSlider(JSlider.HORIZONTAL, 1, 1000, (int) camera.getFocalLength());
-        JTextField focalLengthTextField = new JFormattedTextField(focalLengthSlider.getValue());
+        JTextField focalLengthTextField = new JTextField(decimalFormat.format(focalLengthSlider.getValue()));
         focalLengthTextField.setColumns(4);
         focalLengthSlider.addChangeListener(l -> {
             int value = focalLengthSlider.getValue();
-            focalLengthTextField.setText(df.format(value));
+            focalLengthTextField.setText(decimalFormat.format(value));
             camera.setFocalLength(value);
             renderPanel.repaint();
         });
         focalLengthTextField.addActionListener(l -> {
             double value = Integer.parseInt(focalLengthTextField.getText());
             value = Math.max(focalLengthSlider.getMinimum(), Math.min(value, focalLengthSlider.getMaximum()));
-            focalLengthTextField.setText(df.format(value));
+            focalLengthTextField.setText(decimalFormat.format(value));
             focalLengthSlider.setValue((int) value);
             camera.setFocalLength(value);
             renderPanel.repaint();
@@ -106,18 +102,18 @@ public class RasterCameraSettingsFrame extends JFrame {
 
         JPanel fieldOfViewPanel = new JPanel(new GridBagLayout());
         JSlider fieldOfViewSlider = new JSlider(JSlider.HORIZONTAL, 1, 173, (int) camera.getFieldOfView());
-        JTextField fieldOfViewTextField = new JFormattedTextField(fieldOfViewSlider.getValue());
+        JTextField fieldOfViewTextField = new JTextField(decimalFormat.format(fieldOfViewSlider.getValue()));
         fieldOfViewTextField.setColumns(4);
         fieldOfViewSlider.addChangeListener(l -> {
             int value = fieldOfViewSlider.getValue();
-            fieldOfViewTextField.setText(df.format(value));
+            fieldOfViewTextField.setText(decimalFormat.format(value));
             camera.setFieldOfView(value);
             renderPanel.repaint();
         });
         fieldOfViewTextField.addActionListener(l -> {
             double value = Integer.parseInt(fieldOfViewTextField.getText());
             value = Math.max(fieldOfViewSlider.getMinimum(), Math.min(value, fieldOfViewSlider.getMaximum()));
-            fieldOfViewTextField.setText(df.format(value));
+            fieldOfViewTextField.setText(decimalFormat.format(value));
             fieldOfViewSlider.setValue((int) value);
             camera.setFieldOfView(value);
             renderPanel.repaint();
@@ -132,16 +128,16 @@ public class RasterCameraSettingsFrame extends JFrame {
         g.weightx = 0.2;
         fieldOfViewPanel.add(fieldOfViewTextField, g);
 
-        lensUnitsPanel.add(focalLengthPanel, PinholeRasterCamera.CameraSetupMode.FOCAL_LENGTH.toString());
         lensUnitsPanel.add(fieldOfViewPanel, PinholeRasterCamera.CameraSetupMode.FIELD_OF_VIEW.toString());
+        lensUnitsPanel.add(focalLengthPanel, PinholeRasterCamera.CameraSetupMode.FOCAL_LENGTH.toString());
 
         cameraSetupModeJComboBox.addItemListener(e -> {
             CardLayout cl = (CardLayout)(lensUnitsPanel.getLayout());
             focalLengthSlider.setValue((int) camera.getFocalLength());
-            focalLengthTextField.setText(df.format(
+            focalLengthTextField.setText(decimalFormat.format(
                     Math.max(focalLengthSlider.getMinimum(), Math.min(camera.getFocalLength(), focalLengthSlider.getMaximum()))));
             fieldOfViewSlider.setValue((int) camera.getFieldOfView());
-            fieldOfViewTextField.setText(df.format(
+            fieldOfViewTextField.setText(decimalFormat.format(
                     Math.max(fieldOfViewSlider.getMinimum(), Math.min(camera.getFieldOfView(), fieldOfViewSlider.getMaximum()))));
             cl.show(lensUnitsPanel, Objects.requireNonNull(cameraSetupModeJComboBox.getSelectedItem()).toString());
             renderPanel.repaint();
@@ -167,9 +163,9 @@ public class RasterCameraSettingsFrame extends JFrame {
         JLabel resolutionLabel = new JLabel("Resolution");
         JLabel filmApertureLabel = new JLabel("Film aperture size");
         JLabel filmApertureWidthLabel = new JLabel("Width");
-        JTextField filmApertureWidthTextField = new JTextField(df.format(camera.getFilmApertureWidth()));
+        JTextField filmApertureWidthTextField = new JTextField(decimalFormat.format(camera.getFilmApertureWidth()));
         JLabel filmApertureHeightLabel = new JLabel("Height");
-        JTextField filmApertureHeightTextField = new JTextField(df.format(camera.getFilmApertureHeight()));
+        JTextField filmApertureHeightTextField = new JTextField(decimalFormat.format(camera.getFilmApertureHeight()));
         JLabel filmApertureAspectRatioLabel = new JLabel("Film aspect ratio");
         JComboBox<PinholeRasterCamera.AspectRatio> filmApertureAspectRatioComboBox = new JComboBox<>(PinholeRasterCamera.AspectRatio.values());
         filmApertureAspectRatioComboBox.setSelectedItem(PinholeRasterCamera.AspectRatio.FREE);
@@ -221,9 +217,9 @@ public class RasterCameraSettingsFrame extends JFrame {
 
         JLabel imageLabel = new JLabel("Image size");
         JLabel imageWidthLabel = new JLabel("Width");
-        JTextField imageWidthTextField = new JTextField(df.format(camera.getImageWidth()));
+        JTextField imageWidthTextField = new JTextField(decimalFormat.format(camera.getImageWidth()));
         JLabel imageHeightLabel = new JLabel("Height");
-        JTextField imageHeightTextField = new JTextField(df.format(camera.getImageHeight()));
+        JTextField imageHeightTextField = new JTextField(decimalFormat.format(camera.getImageHeight()));
         JLabel imageAspectRatioLabel = new JLabel("Image aspect ratio");
         JComboBox<PinholeRasterCamera.AspectRatio> imageAspectRatioComboBox = new JComboBox<>(PinholeRasterCamera.AspectRatio.values());
         imageAspectRatioComboBox.setSelectedItem(PinholeRasterCamera.AspectRatio.FREE);
@@ -269,6 +265,7 @@ public class RasterCameraSettingsFrame extends JFrame {
 
         JLabel resolutionGateLabel = new JLabel("Resolution gate");
         JComboBox<PinholeRasterCamera.FitResolutionGate> resolutionGateComboBox = new JComboBox<>(PinholeRasterCamera.FitResolutionGate.values());
+        resolutionGateComboBox.setSelectedItem(PinholeRasterCamera.FitResolutionGate.OVERSCAN);
         resolutionGateComboBox.addActionListener(l -> {
             camera.setFitResolutionGate((PinholeRasterCamera.FitResolutionGate) resolutionGateComboBox.getSelectedItem());
             renderPanel.repaint();
@@ -291,7 +288,7 @@ public class RasterCameraSettingsFrame extends JFrame {
         PinholeRasterCamera.AspectRatio aspectRatio = (PinholeRasterCamera.AspectRatio) aspectRatioJComboBox.getSelectedItem();
 
         assert aspectRatio != null;
-        textFieldTo.setText(df.format(getHeightFromWidthAspectRatio(from, to, aspectRatio)));
+        textFieldTo.setText(decimalFormat.format(getHeightFromWidthAspectRatio(from, to, aspectRatio)));
     }
 
     private void synchronizeAspectRatioHeight(JTextField textFieldFrom, JTextField textFieldTo, JComboBox<PinholeRasterCamera.AspectRatio> aspectRatioJComboBox) {
@@ -300,7 +297,7 @@ public class RasterCameraSettingsFrame extends JFrame {
         PinholeRasterCamera.AspectRatio aspectRatio = (PinholeRasterCamera.AspectRatio) aspectRatioJComboBox.getSelectedItem();
 
         assert aspectRatio != null;
-        textFieldTo.setText(df.format(getWidthFromHeightAspectRatio(to, from, aspectRatio)));
+        textFieldTo.setText(decimalFormat.format(getWidthFromHeightAspectRatio(to, from, aspectRatio)));
     }
 
     private double getHeightFromWidthAspectRatio(double width, double height, PinholeRasterCamera.AspectRatio aspectRatio) {
@@ -339,25 +336,25 @@ public class RasterCameraSettingsFrame extends JFrame {
         JLabel zAxisLabel = new JLabel("Z axis");
         JLabel translationLabel = new JLabel("Translation");
 
-        JTextField m00TextField = new JTextField(df.format(camera.getCameraMatrix().get(0, 0)));
-        JTextField m01TextField = new JTextField(df.format(camera.getCameraMatrix().get(0, 1)));
-        JTextField m02TextField = new JTextField(df.format(camera.getCameraMatrix().get(0, 2)));
-        JTextField m03TextField = new JTextField(df.format(camera.getCameraMatrix().get(0, 3)));
+        JTextField m00TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(0, 0)));
+        JTextField m01TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(0, 1)));
+        JTextField m02TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(0, 2)));
+        JTextField m03TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(0, 3)));
 
-        JTextField m10TextField = new JTextField(df.format(camera.getCameraMatrix().get(1, 0)));
-        JTextField m11TextField = new JTextField(df.format(camera.getCameraMatrix().get(1, 1)));
-        JTextField m12TextField = new JTextField(df.format(camera.getCameraMatrix().get(1, 2)));
-        JTextField m13TextField = new JTextField(df.format(camera.getCameraMatrix().get(1, 3)));
+        JTextField m10TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(1, 0)));
+        JTextField m11TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(1, 1)));
+        JTextField m12TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(1, 2)));
+        JTextField m13TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(1, 3)));
 
-        JTextField m20TextField = new JTextField(df.format(camera.getCameraMatrix().get(2, 0)));
-        JTextField m21TextField = new JTextField(df.format(camera.getCameraMatrix().get(2, 1)));
-        JTextField m22TextField = new JTextField(df.format(camera.getCameraMatrix().get(2, 2)));
-        JTextField m23TextField = new JTextField(df.format(camera.getCameraMatrix().get(2, 3)));
+        JTextField m20TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(2, 0)));
+        JTextField m21TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(2, 1)));
+        JTextField m22TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(2, 2)));
+        JTextField m23TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(2, 3)));
 
-        JTextField m30TextField = new JTextField(df.format(camera.getCameraMatrix().get(3, 0)));
-        JTextField m31TextField = new JTextField(df.format(camera.getCameraMatrix().get(3, 1)));
-        JTextField m32TextField = new JTextField(df.format(camera.getCameraMatrix().get(3, 2)));
-        JTextField m33TextField = new JTextField(df.format(camera.getCameraMatrix().get(3, 3)));
+        JTextField m30TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(3, 0)));
+        JTextField m31TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(3, 1)));
+        JTextField m32TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(3, 2)));
+        JTextField m33TextField = new JTextField(decimalFormat.format(camera.getCameraMatrix().get(3, 3)));
 
         JButton applyTransformButton = new JButton("Apply transform");
         applyTransformButton.addActionListener(l -> {

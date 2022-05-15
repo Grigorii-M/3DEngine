@@ -70,7 +70,7 @@ public class ViewerFrame extends JFrame {
         JSlider yawSlider = new JSlider(JSlider.HORIZONTAL, 0, 360, 180);
         yawSlider.setToolTipText("Rotation around Oy");
         yawSlider.addChangeListener(l -> {
-            //System.out.println("Oy: " + yawSlider.getValue());
+            System.out.println("Oy: " + yawSlider.getValue());
             renderPanel.repaint();
         });
 
@@ -85,7 +85,7 @@ public class ViewerFrame extends JFrame {
         JSlider pitchSlider = new JSlider(JSlider.VERTICAL, 0, 360, 180);
         pitchSlider.setToolTipText("Rotation around Ox");
         pitchSlider.addChangeListener(l -> {
-            //System.out.println("Ox: " + pitchSlider.getValue());
+            System.out.println("Ox: " + pitchSlider.getValue());
             renderPanel.repaint();
         });
 
@@ -99,7 +99,7 @@ public class ViewerFrame extends JFrame {
         JSlider rollSlider = new JSlider(JSlider.VERTICAL, 0, 360, 180);
         rollSlider.setToolTipText("Rotation around Oz");
         rollSlider.addChangeListener(l -> {
-            //System.out.println("Oz: " + rollSlider.getValue());
+            System.out.println("Oz: " + rollSlider.getValue());
             renderPanel.repaint();
         });
 

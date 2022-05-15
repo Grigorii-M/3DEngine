@@ -69,10 +69,7 @@ public class ViewerFrame extends JFrame {
 
         JSlider yawSlider = new JSlider(JSlider.HORIZONTAL, 0, 360, 180);
         yawSlider.setToolTipText("Rotation around Oy");
-        yawSlider.addChangeListener(l -> {
-            System.out.println("Oy: " + yawSlider.getValue());
-            renderPanel.repaint();
-        });
+        yawSlider.addChangeListener(l -> renderPanel.repaint());
 
         c.gridx = 0;
         c.fill = GridBagConstraints.BOTH;
@@ -84,10 +81,7 @@ public class ViewerFrame extends JFrame {
 
         JSlider pitchSlider = new JSlider(JSlider.VERTICAL, 0, 360, 180);
         pitchSlider.setToolTipText("Rotation around Ox");
-        pitchSlider.addChangeListener(l -> {
-            System.out.println("Ox: " + pitchSlider.getValue());
-            renderPanel.repaint();
-        });
+        pitchSlider.addChangeListener(l -> renderPanel.repaint());
 
         c.gridx = 2;
         c.gridy = 0;
@@ -98,10 +92,7 @@ public class ViewerFrame extends JFrame {
 
         JSlider rollSlider = new JSlider(JSlider.VERTICAL, 0, 360, 180);
         rollSlider.setToolTipText("Rotation around Oz");
-        rollSlider.addChangeListener(l -> {
-            System.out.println("Oz: " + rollSlider.getValue());
-            renderPanel.repaint();
-        });
+        rollSlider.addChangeListener(l -> renderPanel.repaint());
 
         c.gridx = 0;
         c.gridy = 0;

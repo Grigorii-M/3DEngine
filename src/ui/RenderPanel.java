@@ -136,15 +136,15 @@ public class RenderPanel extends JPanel {
                         double w2 = Triangle.edgeFunction(triangleVerticesRaster.get(0), triangleVerticesRaster.get(1), pixel) / triangleArea2;
 
                         if (isPixelOverlapping(triangleVerticesRaster, List.of(w0, w1, w2))) {
-                            // For later
-//                            Vector3 barycentricCoordinates = new Vector3(w0, w1, w2);
-//                            Matrix triangleMatrix = new Matrix(new double[] {
-//                                    triangleVerticesRaster.get(0).x, triangleVerticesRaster.get(0).y, triangleVerticesRaster.get(0).z,
-//                                    triangleVerticesRaster.get(1).x, triangleVerticesRaster.get(1).y, triangleVerticesRaster.get(1).z,
-//                                    triangleVerticesRaster.get(2).x, triangleVerticesRaster.get(2).y, triangleVerticesRaster.get(2).z,
-//                            }, 3, 3);
+                            double z = 1 / (
+                                    1 / triangleVerticesRaster.get(0).z * w0
+                                    + 1 / triangleVerticesRaster.get(1).z * w1
+                                    + 1 / triangleVerticesRaster.get(2).z * w2);
 
-                            image.setRGB(x, y, triangle.color.getRGB());
+                            if (z < depthBuffer[y][x]) {
+                                depthBuffer[y][x] = z;
+                                image.setRGB(x, y, triangle.color.getRGB());
+                            }
                         }
                     }
                 }

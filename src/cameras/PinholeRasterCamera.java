@@ -35,10 +35,10 @@ public class PinholeRasterCamera {
     }
 
     private Matrix cameraToWorld = new Matrix(new double[] {
-        0.871214, 0, -0.490904, 0,
-                -0.192902, 0.919559, -0.342346, 0,
-                0.451415, 0.392953, 0.801132, 0,
-                14.777467, 29.361945, 27.993464, 1}, 4, 4);
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0.55, 1, 0,
+            0, 40, 50, 1}, 4, 4);
 
     private double xScale = 1;
     private double yScale = 1;
@@ -69,17 +69,13 @@ public class PinholeRasterCamera {
 
     private void calculateCanvas() {
         canvasTop = ((filmApertureHeight * UnitsConverter.inchToMm / 2) / focalLength) * nearClippingPlane;
-        canvasBottom = -canvasTop;
-
         canvasRight = ((filmApertureWidth * UnitsConverter.inchToMm / 2) / focalLength) * nearClippingPlane;
-        canvasLeft = -canvasRight;
 
         filmAspectRatio = filmApertureWidth / filmApertureHeight;
         deviceAspectRatio = imageWidth / (double) imageHeight;
 
         fieldOfView = 2 * Math.toDegrees(Math.atan((filmApertureWidth * UnitsConverter.inchToMm / 2) / focalLength));
 
-        // Todo: fix this motherfucker
         switch (fitResolutionGate) {
             case FILL -> {
                 if (filmAspectRatio > deviceAspectRatio) {
@@ -97,8 +93,8 @@ public class PinholeRasterCamera {
             }
         }
 
-        canvasRight *= xScale;
         canvasTop *= yScale;
+        canvasRight *= xScale;
 
         canvasLeft = -canvasRight;
         canvasBottom = -canvasTop;

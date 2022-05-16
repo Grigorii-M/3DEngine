@@ -21,7 +21,7 @@ public class RasterCameraSettingsFrame extends JFrame {
         this.renderPanel = renderPanel;
 
         setLocationRelativeTo(renderPanel);
-        setSize(270, 700);
+        setSize(300, 730);
         setResizable(false);
         setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
@@ -148,6 +148,33 @@ public class RasterCameraSettingsFrame extends JFrame {
         c.gridwidth = 2;
         c.gridy = 4;
         lensPanel.add(lensUnitsPanel, c);
+
+        JLabel nearClippingPaneLabel = new JLabel("Near clipping pane");
+        JTextField nearClippingPaneTextField = new JTextField(decimalFormat.format(camera.getNearClippingPlane()));
+        nearClippingPaneTextField.setColumns(3);
+        nearClippingPaneTextField.addActionListener(l -> {
+            camera.setNearClippingPlane(Double.parseDouble(nearClippingPaneTextField.getText()));
+            renderPanel.repaint();
+        });
+
+        JLabel farClippingPaneLabel = new JLabel("Far clipping pane");
+        JTextField farClippingPaneTextField = new JTextField(decimalFormat.format(camera.getFarClippingPlane()));
+        farClippingPaneTextField.setColumns(3);
+        farClippingPaneTextField.addActionListener(l -> {
+            camera.setFarClippingPlane(Double.parseDouble(farClippingPaneTextField.getText()));
+            renderPanel.repaint();
+        });
+
+        c.gridx = 0;
+        c.gridy = 5;
+        lensPanel.add(nearClippingPaneLabel, c);
+        c.gridx = 1;
+        lensPanel.add(nearClippingPaneTextField, c);
+        c.gridx = 0;
+        c.gridy = 6;
+        lensPanel.add(farClippingPaneLabel, c);
+        c.gridx = 1;
+        lensPanel.add(farClippingPaneTextField, c);
 
         lensPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new BevelBorder(BevelBorder.RAISED)));
 

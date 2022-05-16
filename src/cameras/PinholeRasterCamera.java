@@ -10,6 +10,10 @@ public class PinholeRasterCamera {
     private double focalLength = 20; // in mm
     private double fieldOfView; // horizontal
 
+    public ProjectionType getProjectionType() {
+        return projectionType;
+    }
+
     public enum CameraSetupMode {
         FOCAL_LENGTH, FIELD_OF_VIEW
     }
@@ -17,6 +21,7 @@ public class PinholeRasterCamera {
     private double filmApertureWidth = 0.825;
     private double filmApertureHeight = 0.446;
 
+    // Todo: it looks like near clipping plane does not clip objects
     private double nearClippingPlane = 1;
     private double farClippingPlane = 1000;
 
@@ -38,16 +43,14 @@ public class PinholeRasterCamera {
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0.55, 1, 0,
-            0, 40, 50, 1}, 4, 4);
+            0, 40, 50, 1
+    }, 4, 4);
 
     private double xScale = 1;
     private double yScale = 1;
 
     // Perspective projection matrix algorithm is based on implicitly setting up the image plane at the near clipping plane
     private double distanceToCanvas = nearClippingPlane;
-
-    private double filmAspectRatio;
-    private double deviceAspectRatio;
 
     public enum AspectRatio {
         RATIO_4X3,
@@ -71,8 +74,8 @@ public class PinholeRasterCamera {
         canvasTop = ((filmApertureHeight * UnitsConverter.inchToMm / 2) / focalLength) * nearClippingPlane;
         canvasRight = ((filmApertureWidth * UnitsConverter.inchToMm / 2) / focalLength) * nearClippingPlane;
 
-        filmAspectRatio = filmApertureWidth / filmApertureHeight;
-        deviceAspectRatio = imageWidth / (double) imageHeight;
+        double filmAspectRatio = filmApertureWidth / filmApertureHeight;
+        double deviceAspectRatio = imageWidth / (double) imageHeight;
 
         fieldOfView = 2 * Math.toDegrees(Math.atan((filmApertureWidth * UnitsConverter.inchToMm / 2) / focalLength));
 
@@ -106,6 +109,8 @@ public class PinholeRasterCamera {
 
     public void setNearClippingPlane(double nearClippingPlane) {
         this.nearClippingPlane = nearClippingPlane;
+        this.distanceToCanvas = nearClippingPlane;
+        calculateCanvas();
     }
 
     public double getNearClippingPlane() {
@@ -114,6 +119,7 @@ public class PinholeRasterCamera {
 
     public void setFarClippingPlane(double farClippingPlane) {
         this.farClippingPlane = farClippingPlane;
+        calculateCanvas();
     }
 
     public double getFarClippingPlane() {

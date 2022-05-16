@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class OBJParser {
     public ArrayList<Triangle> parse(File file) {
@@ -36,7 +37,8 @@ public class OBJParser {
                     for (int i = 0; i < verticesIndexes.length; i++) {
                         verticesIndexes[i] = Integer.parseInt(terms[i + 1].split("/")[0]);
                     }
-                    triangles.add(new Triangle(vertices.get(verticesIndexes[0] - 1), vertices.get(verticesIndexes[1] - 1), vertices.get(verticesIndexes[2] - 1), Color.WHITE));
+                    // Because textures are not supported parser applies random color to each triangle
+                    triangles.add(new Triangle(vertices.get(verticesIndexes[0] - 1), vertices.get(verticesIndexes[1] - 1), vertices.get(verticesIndexes[2] - 1), getRandomColor()));
                 }
             }
         } catch (IOException e) {
@@ -44,5 +46,10 @@ public class OBJParser {
         }
 
         return triangles;
+    }
+
+    private static Color getRandomColor() {
+        Random random = new Random();
+        return new Color(random.nextFloat(1), random.nextFloat(1), random.nextFloat(1));
     }
 }

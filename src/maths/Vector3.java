@@ -9,6 +9,7 @@ public class Vector3 {
     public final double x;
     public final double y;
     public final double z;
+
     private Double magnitude = null;
 
     public Vector3(double x, double y, double z) {
@@ -18,8 +19,12 @@ public class Vector3 {
         this.z = z;
     }
     
-    public Vector2 getAsVector2D() {
+    public Vector2 getAsVector2() {
         return new Vector2(x, y);
+    }
+
+    public Vector4 getAsVector4() {
+        return new Vector4(x, y, z);
     }
 
     public Vector3 minus(Vector3 v) {
@@ -71,25 +76,25 @@ public class Vector3 {
         return dotProduct;
     }
 
-    /**
-     * Uses vector in a row form to multiply by a matrix.
-     * If a matrix has more rows than vector elements then the values are just added together
-     * (use multiplyByMatrixStrict in order to avoid such behaviour).
-     */
+//    /**
+//     * Uses vector in a row form to multiply by a matrix.
+//     * If a matrix has more rows than vector elements then the values are just added together (as with homogenous coordinates where w = 1)
+//     * (use multiplyByMatrixStrict in order to avoid such behaviour).
+//     */
+//    public Vector3 multiplyByMatrix(Matrix matrix) {
+//        double[] newValues = new double[values.length];
+//        for (int i = 0; i < values.length; i++) {
+//            double value = 0;
+//            for (int j = 0; j < matrix.getRows(); j++) {
+//                value += (j < values.length ? values[j] : 1) * matrix.get(j, i);
+//            }
+//            newValues[i] = value;
+//        }
+//
+//        return new Vector3(newValues[0], newValues[1], newValues[2]);
+//    }
+
     public Vector3 multiplyByMatrix(Matrix matrix) {
-        double[] newValues = new double[values.length];
-        for (int i = 0; i < values.length; i++) {
-            double value = 0;
-            for (int j = 0; j < matrix.getRows(); j++) {
-                value += (j < values.length ? values[j] : 1) * matrix.get(j, i);
-            }
-            newValues[i] = value;
-        }
-
-        return new Vector3(newValues[0], newValues[1], newValues[2]);
-    }
-
-    public Vector3 multiplyByMatrixStrict(Matrix matrix) {
         if (values.length != matrix.getRows()) {
             throw new IllegalArgumentException("Matrix rows does not equal to vector elements");
         }
